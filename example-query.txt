@@ -1,0 +1,116 @@
+CASO TEST:
+
+{
+  "_index": "syslog-2019.02.19",
+  "_type": "doc",
+  "_id": "ztumB2kBZ2OJvpDWD92P",
+  "_version": 1,
+  "_score": null,
+  "_source": {
+    "sset": "NAT-PT-44",
+    "@version": "1",
+    "source": "172.19.0.1",
+    "allocation_timestamp": "2019-02-19T21:15:29.463Z",
+    "@timestamp": "2019-02-19T21:25:17.004Z",
+    "proc": "jservices-nat",
+    "PB_l": 58112,
+    "PB_h": 58367,
+    "allocation_id": "cdqdB2kBZ2OJvpDWHTGC",
+    "sev_code": "150",
+    "type": "syslog",
+    "pub_address": "190.2.112.187",
+    "priv_address": "10.136.72.169",
+    "action": "JSERVICES_NAT_PORT_BLOCK_RELEASE"
+  },
+  "fields": {
+    "@timestamp": [
+      "2019-02-19T21:25:17.004Z"
+    ],
+    "allocation_timestamp": [
+      "2019-02-19T21:15:29.463Z"
+    ]
+  },
+  "highlight": {
+    "action": [
+      "@kibana-highlighted-field@JSERVICES_NAT_PORT_BLOCK_RELEASE@/kibana-highlighted-field@"
+    ]
+  },
+  "sort": [
+    1550611517004
+  ]
+}
+
+
+i = 2019-02-19T21:17:0.0Z
+f = 2019-02-19T21:20:0.0Z
+
+SIN PUERTO:
+
+GET /_search
+{
+  "size":1000,
+  "query": {
+    "bool": {
+      "filter": {
+        "bool": {
+          "must": [
+            { "match": { "pub_address": "190.2.112.187" } },
+            { "match": { "action": "JSERVICES_NAT_PORT_BLOCK_RELEASE" } }
+          ],
+          "should": [ 
+            { "range": { "@timestamp": { "gte": "2019-02-19T21:17", "lte": "2019-02-19T21:20" }  }  },
+            { "range": { "allocation_timestamp": { "gte": "2019-02-19T21:17", "lte": "2019-02-19T21:20" }  }  },
+            { "bool": 
+              {"must":
+                [
+                  { "range": { "allocation_timestamp": { "lte": "2019-02-19T21:17" } } },
+                  { "range": { "@timestamp": { "gte": "2019-02-19T21:20" } } }
+                ]
+              }
+            }
+            
+          ],
+          "minimum_should_match": 1
+        }
+      }
+    }
+  }
+}
+
+CON PUERTO: 
+
+
+GET /_search
+{
+  "size":1000,
+  "query": {
+    "bool": {
+      "filter": {
+        "bool": {
+          "must": [
+            { "match": { "pub_address": "190.2.112.187" } },
+            { "match": { "action": "JSERVICES_NAT_PORT_BLOCK_RELEASE" } },
+            { "range": { "PB_l": { "lte": 58200 } } },
+            { "range": { "PB_h": { "gte": 58200 } } }
+          ],
+          "should": [ 
+            { "range": { "@timestamp": { "gte": "2019-02-19T21:17", "lte": "2019-02-19T21:20" }  }  },
+            { "range": { "allocation_timestamp": { "gte": "2019-02-19T21:17", "lte": "2019-02-19T21:20" }  }  },
+            { "bool": 
+              {"must":
+                [
+                  { "range": { "allocation_timestamp": { "lte": "2019-02-19T21:17" } } },
+                  { "range": { "@timestamp": { "gte": "2019-02-19T21:20" } } }
+                ]
+              }
+            }
+            
+          ],
+          "minimum_should_match": 1
+        }
+      }
+    }
+  }
+}
+
+

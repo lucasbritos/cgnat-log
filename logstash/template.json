@@ -1,0 +1,9 @@
+{
+  "size": 1,
+  "sort" : [ { "@timestamp" : "desc" } ],
+  "query": {
+    "query_string": {
+      "query": "PB_l:%{[PB_l]} AND PB_h:%{[PB_h]} AND pub_address:\"%{[pub_address]}\" AND priv_address:\"%{[priv_address]}\""
+    }
+  },  "_source": ["@timestamp"]
+}

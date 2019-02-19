@@ -1,0 +1,48 @@
+version: '3'
+services:
+
+  elasticsearch:
+    container_name: cgnat-log_elasticsearch
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.6.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    restart: always
+    networks:
+      default:
+        aliases:
+          - elasticsearch
+
+
+  logstash:
+    container_name: cgnat-log_logstash
+    build: logstash/.
+    ports:
+      - "2540:2540/udp"
+    volumes:
+      - ${PWD}/logstash:/config
+    environment:
+      - XPACK_MONITORING_ENABLED=false
+    command: -f /config/conf.d/* --config.reload.automatic
+    restart: always
+    networks:
+      default:
+        aliases:
+          - logstash
+
+  kibana:
+    container_name: cgnat-log_kibana
+    image: docker.elastic.co/kibana/kibana:6.6.0
+    ports:
+      - "5601:5601"
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+
+volumes:
+  esdata:
+
+networks:
+  default:
